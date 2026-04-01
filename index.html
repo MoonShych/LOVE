@@ -1,0 +1,132 @@
+```html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>รักนะไอ้อ้วงงงง</title>
+
+<style>
+body {
+  margin: 0;
+  background: radial-gradient(circle, #000 40%, #0a0a0a);
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+/* ❤️ ข้อความตรงกลาง */
+.center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(20px, 5vw, 40px);
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  z-index: 10;
+
+  /* ✨ glow */
+  text-shadow:
+    0 0 10px #fff,
+    0 0 20px #ff4da6,
+    0 0 40px #ff4da6;
+
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* 💓 เต้นเบาๆ */
+@keyframes pulse {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  50%  { transform: translate(-50%, -50%) scale(1.1); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* LOVE รอบๆ */
+#ui span {
+  position: absolute;
+  font-size: clamp(10px, 2vw, 18px);
+  font-weight: bold;
+  white-space: nowrap;
+
+  color: #ff4da6;
+
+  text-shadow:
+    0 0 5px #fff,
+    0 0 10px #ff4da6,
+    0 0 20px #ff4da6,
+    0 0 40px #ff80bf;
+
+  animation:
+    float 4s infinite ease-in-out,
+    glow 2s infinite alternate;
+}
+
+@keyframes float {
+  0%   { transform: translateY(0) scale(1); }
+  50%  { transform: translateY(-12px) scale(1.2); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes glow {
+  0% {
+    text-shadow:
+      0 0 5px #fff,
+      0 0 10px #ff4da6,
+      0 0 20px #ff4da6;
+  }
+  100% {
+    text-shadow:
+      0 0 10px #fff,
+      0 0 20px #ff66b2,
+      0 0 40px #ff99cc,
+      0 0 60px #ff66b2;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="ui"></div>
+
+<!-- ❤️ ข้อความตรงกลาง -->
+<div class="center-text">
+    Happy Anniversary 2 months B&P💖
+</div>
+
+<script>
+const ui = document.getElementById("ui");
+
+const total = 100;
+const scale = Math.min(window.innerWidth, window.innerHeight) / 35;
+
+for (let i = 0; i < total; i++) {
+  const t = (i / total) * Math.PI * 2;
+
+  const x = 16 * Math.pow(Math.sin(t), 3);
+  const y =
+    13 * Math.cos(t) -
+    5 * Math.cos(2 * t) -
+    2 * Math.cos(3 * t) -
+    Math.cos(4 * t);
+
+  const span = document.createElement("span");
+  span.innerText = "LOVE";
+
+  span.style.left = (window.innerWidth / 2 + x * scale) + "px";
+  span.style.top = (window.innerHeight / 2 - y * scale) + "px";
+
+  span.style.animationDelay = (i * 0.02) + "s";
+
+  ui.appendChild(span);
+}
+
+window.addEventListener("resize", () => {
+  location.reload();
+});
+</script>
+
+</body>
+</html>
+```
