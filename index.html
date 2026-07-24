@@ -1,132 +1,165 @@
-```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>รักนะไอ้อ้วงงงง</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ถึงอ้วน 💌</title>
 
-<style>
-body {
-  margin: 0;
-  background: radial-gradient(circle, #000 40%, #0a0a0a);
-  overflow: hidden;
-  font-family: sans-serif;
-}
+<!-- ฟอนต์ไทยสไตล์หรู: Charm สำหรับหัวเรื่อง (ตัวเขียนอ่อนหวาน), Prompt สำหรับเนื้อหา -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Charm:wght@400;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-/* ❤️ ข้อความตรงกลาง */
-.center-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: clamp(20px, 5vw, 40px);
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-  z-index: 10;
-
-  /* ✨ glow */
-  text-shadow:
-    0 0 10px #fff,
-    0 0 20px #ff4da6,
-    0 0 40px #ff4da6;
-
-  animation: pulse 2s infinite ease-in-out;
-}
-
-/* 💓 เต้นเบาๆ */
-@keyframes pulse {
-  0%   { transform: translate(-50%, -50%) scale(1); }
-  50%  { transform: translate(-50%, -50%) scale(1.1); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-/* LOVE รอบๆ */
-#ui span {
-  position: absolute;
-  font-size: clamp(10px, 2vw, 18px);
-  font-weight: bold;
-  white-space: nowrap;
-
-  color: #ff4da6;
-
-  text-shadow:
-    0 0 5px #fff,
-    0 0 10px #ff4da6,
-    0 0 20px #ff4da6,
-    0 0 40px #ff80bf;
-
-  animation:
-    float 4s infinite ease-in-out,
-    glow 2s infinite alternate;
-}
-
-@keyframes float {
-  0%   { transform: translateY(0) scale(1); }
-  50%  { transform: translateY(-12px) scale(1.2); }
-  100% { transform: translateY(0) scale(1); }
-}
-
-@keyframes glow {
-  0% {
-    text-shadow:
-      0 0 5px #fff,
-      0 0 10px #ff4da6,
-      0 0 20px #ff4da6;
-  }
-  100% {
-    text-shadow:
-      0 0 10px #fff,
-      0 0 20px #ff66b2,
-      0 0 40px #ff99cc,
-      0 0 60px #ff66b2;
-  }
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div id="ui"></div>
+  <!-- ================= พื้นหลังทั่วทั้งเว็บ: ดาวระยิบระยับ + หัวใจลอย ================= -->
+  <div id="bg-stars" aria-hidden="true"></div>
+  <div id="bg-hearts" aria-hidden="true"></div>
 
-<!-- ❤️ ข้อความตรงกลาง -->
-<div class="center-text">
-    Happy Anniversary 6 months B&P💖
-</div>
+  <!-- ================= ปุ่มควบคุมเพลง (โผล่มาหลังเปิดซอง) ================= -->
+  <div id="music-player" class="hidden">
+    <button id="music-toggle" aria-label="เปิด/ปิดเพลง">
+      <span id="music-icon">🎵</span>
+    </button>
+    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="ปรับระดับเสียง">
+  </div>
+  <!-- ผู้ใช้สามารถเปลี่ยนไฟล์เพลงได้ที่ music.mp3 -->
+  <audio id="bg-music" src="music.mp3" loop preload="none"></audio>
 
-<script>
-const ui = document.getElementById("ui");
+  <!-- ================= ฉากที่ 1: หน้าเปิด / ซองจดหมาย 3 มิติ ================= -->
+  <section id="intro-scene">
+    <div class="envelope-wrap">
+      <div id="envelope" class="envelope" role="button" tabindex="0" aria-label="แตะเพื่อเปิดจดหมาย">
 
-const total = 100;
-const scale = Math.min(window.innerWidth, window.innerHeight) / 35;
+        <div class="envelope-back"></div>
 
-for (let i = 0; i < total; i++) {
-  const t = (i / total) * Math.PI * 2;
+        <!-- กระดาษจดหมายที่จะเลื่อนขึ้นตอนเปิด -->
+        <div class="envelope-paper">
+          <p class="paper-heart">💌</p>
+          <p class="paper-line">ถึงอ้วน</p>
+          <p class="paper-heart small">❤️</p>
+        </div>
 
-  const x = 16 * Math.pow(Math.sin(t), 3);
-  const y =
-    13 * Math.cos(t) -
-    5 * Math.cos(2 * t) -
-    2 * Math.cos(3 * t) -
-    Math.cos(4 * t);
+        <div class="envelope-flap"></div>
 
-  const span = document.createElement("span");
-  span.innerText = "LOVE";
+        <div class="envelope-front">
+          <span class="envelope-emoji">💌</span>
+          <span class="envelope-title">ถึงอ้วน ❤️</span>
+        </div>
 
-  span.style.left = (window.innerWidth / 2 + x * scale) + "px";
-  span.style.top = (window.innerHeight / 2 - y * scale) + "px";
+        <div class="envelope-seal">❤</div>
+      </div>
 
-  span.style.animationDelay = (i * 0.02) + "s";
+      <p id="tap-hint">แตะเพื่อเปิดจดหมาย</p>
+    </div>
+  </section>
 
-  ui.appendChild(span);
-}
+  <!-- ================= ฉากที่ 2: จดหมาย (Typewriter) ================= -->
+  <section id="letter-scene">
+    <div class="letter-card">
+      <div class="letter-corner top-left">❀</div>
+      <div class="letter-corner top-right">❀</div>
 
-window.addEventListener("resize", () => {
-  location.reload();
-});
-</script>
+      <div id="typewriter-text" class="typewriter-text"></div>
+      <span id="typewriter-cursor" class="typewriter-cursor">|</span>
 
+      <div class="letter-corner bottom-left">❀</div>
+      <div class="letter-corner bottom-right">❀</div>
+    </div>
+
+    <!-- ================= ตัวนับเวลาที่คบกัน ================= -->
+    <div id="love-counter" class="love-counter">
+      <p class="counter-title">เราอยู่ด้วยกันมาแล้ว</p>
+      <div class="counter-grid">
+        <div class="counter-box">
+          <span id="count-days" class="counter-num">0</span>
+          <span class="counter-label">วัน</span>
+        </div>
+        <div class="counter-box">
+          <span id="count-hours" class="counter-num">0</span>
+          <span class="counter-label">ชั่วโมง</span>
+        </div>
+        <div class="counter-box">
+          <span id="count-minutes" class="counter-num">0</span>
+          <span class="counter-label">นาที</span>
+        </div>
+        <div class="counter-box">
+          <span id="count-seconds" class="counter-num">0</span>
+          <span class="counter-label">วินาที</span>
+        </div>
+      </div>
+      <p class="counter-since">นับจาก 01/10/2025</p>
+    </div>
+
+    <div class="scroll-down-hint">
+      <span>เลื่อนลงเพื่อดูความทรงจำของเรา</span>
+      <span class="scroll-arrow">↓</span>
+    </div>
+  </section>
+
+  <!-- ================= ฉากที่ 3: แกลเลอรีรูปภาพ ================= -->
+  <section id="gallery-scene">
+    <h2 class="gallery-title">รูป</h2>
+
+    <div class="gallery-grid">
+      <!-- แต่ละรูปมี data-effect กำหนดแอนิเมชันตอนเลื่อนหน้าจอ: fade / zoom / parallax / slide-left / slide-right -->
+      <figure class="gallery-item" data-effect="fade">
+        <img src="1.jpeg" alt="ความทรงจำ 1" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+      <figure class="gallery-item" data-effect="slide-left">
+        <img src="2.jpeg" alt="ความทรงจำ 2" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+      <figure class="gallery-item" data-effect="zoom">
+        <img src="3.png" alt="ความทรงจำ 3" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+      <figure class="gallery-item" data-effect="slide-right">
+        <img src="4.jpg" alt="ความทรงจำ 4" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+      <figure class="gallery-item" data-effect="parallax">
+        <img src="5.jpeg" alt="ความทรงจำ 5" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+      <figure class="gallery-item" data-effect="fade">
+        <img src="6.jpeg" alt="ความทรงจำ 6" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+      <figure class="gallery-item" data-effect="slide-left">
+        <img src="7.jpeg" alt="ความทรงจำ 7" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+      <figure class="gallery-item" data-effect="zoom">
+        <img src="8.jpeg" alt="ความทรงจำ 8" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+      <figure class="gallery-item" data-effect="slide-right">
+        <img src="9.jpeg" alt="ความทรงจำ 9" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+      <figure class="gallery-item" data-effect="parallax">
+        <img src="10.jpeg" alt="ความทรงจำ 10" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
+        <figcaption>💗</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= ฉากที่ 4: ตอนจบ ================= -->
+  <section id="ending-scene">
+    <div id="petals-fall" aria-hidden="true"></div>
+    <div id="confetti-layer" aria-hidden="true"></div>
+
+    <div class="ending-content">
+      <div class="big-heart">❤</div>
+      <h1 class="ending-text">รักอ้วนมากที่สุด ❤️</h1>
+      <p class="ending-sub">จากคนที่รักอ้วนที่สุด</p>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
 </body>
 </html>
-```
