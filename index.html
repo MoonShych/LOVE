@@ -2,33 +2,32 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>สำหรับคนพิเศษของเค้า ❤️</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Happy Anniversary ❤️</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<!-- ============================================================
-     PAGE 1 — LOCK SCREEN
-     PIN unlock using a custom numeric keypad (no <input>, no
-     mobile keyboard). PIN = 011025
-============================================================ -->
-<section id="page-lock" class="page page-active">
-  <div class="glow-blob glow-blob-a"></div>
-  <div class="glow-blob glow-blob-b"></div>
-  <div class="dust-layer" id="dust-lock"></div>
+<div id="app">
 
-  <div class="lock-content">
+  <!-- Ambient glow blobs + floating hearts/petals/sparkles (behind everything) -->
+  <div class="glow-blob a"></div>
+  <div class="glow-blob b"></div>
+  <div id="ambient-layer"></div>
+
+  <!-- ============ PAGE 1 : LOCK SCREEN ============ -->
+  <section id="page-lock" class="page active">
     <div class="lock-heart">❤️</div>
-    <p class="lock-title">สำหรับคนพิเศษของเค้า ❤️</p>
+    <h1 class="lock-title">Happy Anniversary ❤️</h1>
+    <p class="lock-sub">กรอกรหัสของเรา</p>
 
-    <div class="pin-dots" id="pin-dots">
-      <span class="pin-dot"></span>
-      <span class="pin-dot"></span>
-      <span class="pin-dot"></span>
-      <span class="pin-dot"></span>
-      <span class="pin-dot"></span>
-      <span class="pin-dot"></span>
+    <div class="dots-row" id="dotsRow">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
     </div>
 
     <div class="keypad" id="keypad">
@@ -41,146 +40,124 @@
       <button class="key" data-key="7">7</button>
       <button class="key" data-key="8">8</button>
       <button class="key" data-key="9">9</button>
-      <button class="key key-back" data-key="back">⌫</button>
+      <button class="key" data-key="back">⌫</button>
       <button class="key" data-key="0">0</button>
-      <button class="key key-heart" data-key="heart">❤</button>
+      <button class="key confirm" data-key="ok">✓</button>
     </div>
+
+    <p class="lock-hint" id="lockHint">💭 Hint : วันที่ที่ทุกอย่างเริ่มต้น</p>
+  </section>
+
+  <!-- ============ HEART PORTAL TRANSITION ============ -->
+  <div id="portal">
+    <div class="portal-flood" id="portalFlood"></div>
+    <div class="portal-heart" id="portalHeart">❤️</div>
   </div>
 
-  <div class="lock-mask" id="lock-mask"></div>
-</section>
+  <!-- ============ PAGE 2 : HOME ============ -->
+  <section id="page-home" class="page">
+    <h1 class="home-title">Happy Anniversary ❤️</h1>
 
-<!-- ============================================================
-     PAGE 2 — HEART CURTAIN TRANSITION
-     Left/right walls of hearts sweep to center, bloom, then
-     part like a theatre curtain to reveal page 3.
-============================================================ -->
-<section id="page-curtain" class="page">
-  <div class="curtain-side curtain-left" id="curtain-left"></div>
-  <div class="curtain-side curtain-right" id="curtain-right"></div>
-</section>
+    <div class="glass home-card">
+      <p class="home-sub">เริ่มต้นความทรงจำ</p>
+      <p class="home-date" id="startDateLabel">01/10/2025</p>
 
-<!-- ============================================================
-     PAGE 3 — ENVELOPE
-============================================================ -->
-<section id="page-envelope" class="page">
-  <div class="soft-hearts-bg" id="dust-envelope"></div>
-  <button class="music-toggle" id="music-toggle" aria-label="เปิด/ปิดเพลง">🎵</button>
-
-  <div class="envelope-wrap">
-    <p class="envelope-hint">แตะเพื่อเปิด</p>
-    <div class="envelope-3d" id="envelope">
-      <div class="envelope-back"></div>
-      <div class="paper" id="envelope-paper">
-        <p>ถึงคนที่เค้ารัก...</p>
+      <p class="timer-title">อยู่ด้วยกันมา</p>
+      <div class="timer-grid">
+        <div class="glass timer-cell"><div class="timer-num" id="tYears">0</div><div class="timer-label">ปี</div></div>
+        <div class="glass timer-cell"><div class="timer-num" id="tMonths">0</div><div class="timer-label">เดือน</div></div>
+        <div class="glass timer-cell"><div class="timer-num" id="tDays">0</div><div class="timer-label">วัน</div></div>
       </div>
-      <div class="envelope-flap" id="envelope-flap"></div>
-      <div class="envelope-front"></div>
-      <div class="envelope-seal">❤</div>
+      <div class="timer-grid small">
+        <div class="glass timer-cell"><div class="timer-num" id="tHours">0</div><div class="timer-label">ชั่วโมง</div></div>
+        <div class="glass timer-cell"><div class="timer-num" id="tMinutes">0</div><div class="timer-label">นาที</div></div>
+        <div class="glass timer-cell"><div class="timer-num" id="tSeconds">0</div><div class="timer-label">วินาที</div></div>
+      </div>
     </div>
-  </div>
-</section>
 
-<!-- ============================================================
-     PAGE 4 — LOVE LETTER (typewriter)
-============================================================ -->
-<section id="page-letter" class="page">
-  <div class="soft-hearts-bg" id="dust-letter"></div>
-  <div class="letter-sheet">
-    <p id="letter-text" class="letter-text"></p>
-    <span class="typewriter-cursor" id="letter-cursor">|</span>
-    <button class="next-btn" id="letter-next-btn" style="display:none;">ดูต่อ →</button>
-  </div>
-</section>
+    <button class="enter-btn" data-goto="letter">เปิดจดหมายรัก 💌</button>
+  </section>
 
-<!-- ============================================================
-     PAGE 5 — GALLERY (swipe)
-============================================================ -->
-<section id="page-gallery" class="page">
-  <h2 class="section-title">ความทรงจำของเรา ❤️</h2>
-  <div class="gallery-wrap">
-    <div class="gallery-track" id="gallery-track">
-      <!-- slides injected by script.js from assets/images -->
+  <!-- ============ PAGE 3 : LOVE LETTER ============ -->
+  <section id="page-letter" class="page">
+    <div class="envelope" id="envelope">
+      <div class="envelope-body"></div>
+      <div class="envelope-flap"></div>
+      <div class="envelope-heart">❤️</div>
     </div>
-    <div class="gallery-dots" id="gallery-dots"></div>
-  </div>
-  <button class="next-btn" id="gallery-next-btn">ดูต่อ →</button>
+    <p class="envelope-hint" id="envelopeHint">แตะซองจดหมายเพื่ออ่าน</p>
+    <div class="glass letter-paper" id="letterPaper"><span id="letterText"></span><span class="typewriter-cursor" id="letterCursor"></span></div>
+  </section>
 
-  <div class="fullscreen-viewer" id="fullscreen-viewer">
-    <img id="fullscreen-img" src="" alt="">
-  </div>
-</section>
+  <!-- ============ PAGE 4 : MEMORY GALLERY ============ -->
+  <section id="page-gallery" class="page">
+    <h2 class="gallery-title">คลังความทรงจำของเรา 🌸</h2>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </section>
 
-<!-- ============================================================
-     PAGE 6 — ANNIVERSARY COUNTER
-============================================================ -->
-<section id="page-counter" class="page">
-  <div class="soft-hearts-bg" id="dust-counter"></div>
-  <h2 class="section-title">เราอยู่ด้วยกันมาแล้ว ❤️</h2>
-
-  <div class="counter-grid">
-    <div class="counter-box">
-      <span class="counter-num" id="count-days">0</span>
-      <span class="counter-label">วัน</span>
-    </div>
-    <div class="counter-box">
-      <span class="counter-num" id="count-hours">0</span>
-      <span class="counter-label">ชม.</span>
-    </div>
-    <div class="counter-box">
-      <span class="counter-num" id="count-minutes">0</span>
-      <span class="counter-label">นาที</span>
-    </div>
-    <div class="counter-box">
-      <span class="counter-num" id="count-seconds">0</span>
-      <span class="counter-label">วิฯ</span>
-    </div>
+  <!-- Lightbox for gallery -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <img id="lightboxImg" src="" alt="memory">
+    <div class="lightbox-counter" id="lightboxCounter"></div>
   </div>
 
-  <p class="counter-caption">ทุกวินาทีที่มีเธอ มีความหมายสำหรับเค้า ❤️</p>
-  <button class="next-btn" id="counter-next-btn">ดูต่อ →</button>
-</section>
+  <!-- ============ PAGE 5 : VOICE MESSAGE ============ -->
+  <section id="page-voice" class="page">
+    <div class="glass voice-card">
+      <div class="voice-emoji">🎤</div>
+      <p class="voice-title">มีอะไรอยากบอกเธอ</p>
+      <button class="voice-play" id="voicePlayBtn">▶</button>
+      <div class="voice-progress-track"><div class="voice-progress-fill" id="voiceProgressFill"></div></div>
+      <p class="voice-time" id="voiceTime">0:00 / 0:00</p>
+    </div>
+    <button class="enter-btn" data-goto="ending" style="margin-top:26px;">ไปหน้าสุดท้าย ❤️</button>
+  </section>
 
-<!-- ============================================================
-     PAGE 7 — VOICE MESSAGE
-============================================================ -->
-<section id="page-voice" class="page">
-  <div class="soft-hearts-bg" id="dust-voice"></div>
-  <div class="voice-card">
-    <div class="voice-mic">🎙️</div>
-    <p class="voice-title">ข้อความเสียงจากเค้า ❤️</p>
-    <button class="voice-play-btn" id="voice-play-btn">▶ เล่น</button>
-    <div class="voice-wave" id="voice-wave">
-      <span></span><span></span><span></span><span></span><span></span>
+  <!-- Top-right icon actions -->
+  <div class="top-actions" id="topActions" style="display:none;">
+    <button class="icon-btn music-toggle muted" id="musicToggle">
+      <span class="music-on">🔊</span><span class="music-off">🔇</span>
+    </button>
+  </div>
+
+  <!-- Bottom nav (pages 2-5) -->
+  <div class="bottom-nav" id="bottomNav" style="display:none;">
+    <div class="glass" style="display:flex; gap:6px; padding:8px; border-radius:999px;">
+      <button class="nav-dot" data-goto="home" title="หน้าแรก">🏠</button>
+      <button class="nav-dot" data-goto="letter" title="จดหมาย">💌</button>
+      <button class="nav-dot" data-goto="gallery" title="รูปภาพ">🖼️</button>
+      <button class="nav-dot" data-goto="voice" title="เสียง">🎤</button>
+      <button class="nav-dot" data-goto="ending" title="ตอนจบ">❤️</button>
     </div>
   </div>
-  <button class="next-btn" id="voice-next-btn">ดูต่อ →</button>
-</section>
 
-<!-- ============================================================
-     PAGE 8 — ENDING
-============================================================ -->
-<section id="page-ending" class="page">
-  <div class="ending-stars" id="ending-stars"></div>
-  <div class="soft-hearts-bg" id="dust-ending"></div>
+  <!-- ============ FINAL ENDING ============ -->
+  <section id="page-ending" class="page">
+    <div class="lock-heart">❤️</div>
+    <h1 class="home-title" style="margin-top:10px;">พร้อมสำหรับตอนจบหรือยัง?</h1>
+    <button class="ending-intro-btn" id="endingStartBtn" style="margin-top:24px;">❤️ หน้าสุดท้าย</button>
+  </section>
 
-  <div class="ending-content">
-    <p id="ending-text" class="ending-text"></p>
-    <span class="typewriter-cursor" id="ending-cursor">|</span>
-    <button class="hug-btn" id="hug-btn" style="display:none;">❤️ กอดหน่อย ❤️</button>
+  <div class="ending-stage" id="endingStage">
+    <div id="riseHeartsLayer"></div>
+    <div id="rainHeartsLayer"></div>
+    <button class="hug-btn hidden" id="hugBtn">🤗 กอด</button>
+    <div class="light-burst" id="lightBurst"></div>
+    <div class="final-message" id="finalMessage">
+      <h1 class="final-title">รักอ้วนเสมอ ❤️</h1>
+      <p class="final-sub">ขอบคุณที่เดินมาด้วยกัน</p>
+      <p class="final-sub2">Happy Anniversary</p>
+      <button class="replay-btn" id="replayBtn">ดูอีกครั้ง 🔁</button>
+    </div>
   </div>
 
-  <div class="hug-burst" id="hug-burst"></div>
-</section>
+  <!-- Audio elements -->
+  <audio id="bgMusic" loop preload="auto"></audio>
+  <audio id="voiceAudio" preload="auto"></audio>
 
-<!-- audio elements -->
-<audio id="audio-song" src="assets/song.mp3" loop></audio>
-<audio id="audio-voice" src="assets/voice.mp3"></audio>
-<audio id="audio-unlock" src="assets/unlock.mp3"></audio>
-<audio id="audio-click" src="assets/click.mp3"></audio>
-<audio id="audio-whoosh" src="assets/whoosh.mp3"></audio>
-<audio id="audio-paper" src="assets/paper.mp3"></audio>
+</div>
 
-<script src="script.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

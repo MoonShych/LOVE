@@ -1,0 +1,1 @@
+วางไฟล์รูปคู่ของคุณไว้ที่นี่ เช่น photo1.jpg ... ให้ตรงกับที่ตั้งไว้ใน script.js -> CONFIG.gallery / CONFIG.timeline
