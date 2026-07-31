@@ -3,163 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ถึงอ้วน 💌</title>
-
-<!-- ฟอนต์ไทยสไตล์หรู: Charm สำหรับหัวเรื่อง (ตัวเขียนอ่อนหวาน), Prompt สำหรับเนื้อหา -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Charm:wght@400;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+<title>สำหรับคนพิเศษของเค้า ❤️</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ================= พื้นหลังทั่วทั้งเว็บ: ดาวระยิบระยับ + หัวใจลอย ================= -->
-  <div id="bg-stars" aria-hidden="true"></div>
-  <div id="bg-hearts" aria-hidden="true"></div>
+<!-- ============================================================
+     PAGE 1 — LOCK SCREEN
+     PIN unlock using a custom numeric keypad (no <input>, no
+     mobile keyboard). PIN = 011025
+============================================================ -->
+<section id="page-lock" class="page page-active">
+  <div class="glow-blob glow-blob-a"></div>
+  <div class="glow-blob glow-blob-b"></div>
+  <div class="dust-layer" id="dust-lock"></div>
 
-  <!-- ================= ปุ่มควบคุมเพลง (โผล่มาหลังเปิดซอง) ================= -->
-  <div id="music-player" class="hidden">
-    <button id="music-toggle" aria-label="เปิด/ปิดเพลง">
-      <span id="music-icon">🎵</span>
-    </button>
-    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="ปรับระดับเสียง">
+  <div class="lock-content">
+    <div class="lock-heart">❤️</div>
+    <p class="lock-title">สำหรับคนพิเศษของเค้า ❤️</p>
+
+    <div class="pin-dots" id="pin-dots">
+      <span class="pin-dot"></span>
+      <span class="pin-dot"></span>
+      <span class="pin-dot"></span>
+      <span class="pin-dot"></span>
+      <span class="pin-dot"></span>
+      <span class="pin-dot"></span>
+    </div>
+
+    <div class="keypad" id="keypad">
+      <button class="key" data-key="1">1</button>
+      <button class="key" data-key="2">2</button>
+      <button class="key" data-key="3">3</button>
+      <button class="key" data-key="4">4</button>
+      <button class="key" data-key="5">5</button>
+      <button class="key" data-key="6">6</button>
+      <button class="key" data-key="7">7</button>
+      <button class="key" data-key="8">8</button>
+      <button class="key" data-key="9">9</button>
+      <button class="key key-back" data-key="back">⌫</button>
+      <button class="key" data-key="0">0</button>
+      <button class="key key-heart" data-key="heart">❤</button>
+    </div>
   </div>
-  <!-- ผู้ใช้สามารถเปลี่ยนไฟล์เพลงได้ที่ music.mp3 -->
-  <audio id="bg-music" src="music.mp3" loop preload="none"></audio>
 
-  <!-- ================= ฉากที่ 1: หน้าเปิด / ซองจดหมาย 3 มิติ ================= -->
-  <section id="intro-scene">
-    <div class="envelope-wrap">
-      <div id="envelope" class="envelope" role="button" tabindex="0" aria-label="แตะเพื่อเปิดจดหมาย">
+  <div class="lock-mask" id="lock-mask"></div>
+</section>
 
-        <div class="envelope-back"></div>
+<!-- ============================================================
+     PAGE 2 — HEART CURTAIN TRANSITION
+     Left/right walls of hearts sweep to center, bloom, then
+     part like a theatre curtain to reveal page 3.
+============================================================ -->
+<section id="page-curtain" class="page">
+  <div class="curtain-side curtain-left" id="curtain-left"></div>
+  <div class="curtain-side curtain-right" id="curtain-right"></div>
+</section>
 
-        <!-- กระดาษจดหมายที่จะเลื่อนขึ้นตอนเปิด -->
-        <div class="envelope-paper">
-          <p class="paper-heart">💌</p>
-          <p class="paper-line">ถึงอ้วน</p>
-          <p class="paper-heart small">❤️</p>
-        </div>
+<!-- ============================================================
+     PAGE 3 — ENVELOPE
+============================================================ -->
+<section id="page-envelope" class="page">
+  <div class="soft-hearts-bg" id="dust-envelope"></div>
+  <button class="music-toggle" id="music-toggle" aria-label="เปิด/ปิดเพลง">🎵</button>
 
-        <div class="envelope-flap"></div>
-
-        <div class="envelope-front">
-          <span class="envelope-emoji">💌</span>
-          <span class="envelope-title">ถึงอ้วน ❤️</span>
-        </div>
-
-        <div class="envelope-seal">❤</div>
+  <div class="envelope-wrap">
+    <p class="envelope-hint">แตะเพื่อเปิด</p>
+    <div class="envelope-3d" id="envelope">
+      <div class="envelope-back"></div>
+      <div class="paper" id="envelope-paper">
+        <p>ถึงคนที่เค้ารัก...</p>
       </div>
-
-      <p id="tap-hint">แตะเพื่อเปิดจดหมาย</p>
+      <div class="envelope-flap" id="envelope-flap"></div>
+      <div class="envelope-front"></div>
+      <div class="envelope-seal">❤</div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ================= ฉากที่ 2: จดหมาย (Typewriter) ================= -->
-  <section id="letter-scene">
-    <div class="letter-card">
-      <div class="letter-corner top-left">❀</div>
-      <div class="letter-corner top-right">❀</div>
+<!-- ============================================================
+     PAGE 4 — LOVE LETTER (typewriter)
+============================================================ -->
+<section id="page-letter" class="page">
+  <div class="soft-hearts-bg" id="dust-letter"></div>
+  <div class="letter-sheet">
+    <p id="letter-text" class="letter-text"></p>
+    <span class="typewriter-cursor" id="letter-cursor">|</span>
+    <button class="next-btn" id="letter-next-btn" style="display:none;">ดูต่อ →</button>
+  </div>
+</section>
 
-      <div id="typewriter-text" class="typewriter-text"></div>
-      <span id="typewriter-cursor" class="typewriter-cursor">|</span>
-
-      <div class="letter-corner bottom-left">❀</div>
-      <div class="letter-corner bottom-right">❀</div>
+<!-- ============================================================
+     PAGE 5 — GALLERY (swipe)
+============================================================ -->
+<section id="page-gallery" class="page">
+  <h2 class="section-title">ความทรงจำของเรา ❤️</h2>
+  <div class="gallery-wrap">
+    <div class="gallery-track" id="gallery-track">
+      <!-- slides injected by script.js from assets/images -->
     </div>
+    <div class="gallery-dots" id="gallery-dots"></div>
+  </div>
+  <button class="next-btn" id="gallery-next-btn">ดูต่อ →</button>
 
-    <!-- ================= ตัวนับเวลาที่คบกัน ================= -->
-    <div id="love-counter" class="love-counter">
-      <p class="counter-title">เราอยู่ด้วยกันมาแล้ว</p>
-      <div class="counter-grid">
-        <div class="counter-box">
-          <span id="count-days" class="counter-num">0</span>
-          <span class="counter-label">วัน</span>
-        </div>
-        <div class="counter-box">
-          <span id="count-hours" class="counter-num">0</span>
-          <span class="counter-label">ชั่วโมง</span>
-        </div>
-        <div class="counter-box">
-          <span id="count-minutes" class="counter-num">0</span>
-          <span class="counter-label">นาที</span>
-        </div>
-        <div class="counter-box">
-          <span id="count-seconds" class="counter-num">0</span>
-          <span class="counter-label">วินาที</span>
-        </div>
-      </div>
-      <p class="counter-since">นับจาก 01/10/2025</p>
+  <div class="fullscreen-viewer" id="fullscreen-viewer">
+    <img id="fullscreen-img" src="" alt="">
+  </div>
+</section>
+
+<!-- ============================================================
+     PAGE 6 — ANNIVERSARY COUNTER
+============================================================ -->
+<section id="page-counter" class="page">
+  <div class="soft-hearts-bg" id="dust-counter"></div>
+  <h2 class="section-title">เราอยู่ด้วยกันมาแล้ว ❤️</h2>
+
+  <div class="counter-grid">
+    <div class="counter-box">
+      <span class="counter-num" id="count-days">0</span>
+      <span class="counter-label">วัน</span>
     </div>
-
-    <div class="scroll-down-hint">
-      <span>เลื่อนลงเพื่อดูความทรงจำของเรา</span>
-      <span class="scroll-arrow">↓</span>
+    <div class="counter-box">
+      <span class="counter-num" id="count-hours">0</span>
+      <span class="counter-label">ชม.</span>
     </div>
-  </section>
-
-  <!-- ================= ฉากที่ 3: แกลเลอรีรูปภาพ ================= -->
-  <section id="gallery-scene">
-    <h2 class="gallery-title">รูป</h2>
-
-    <div class="gallery-grid">
-      <!-- แต่ละรูปมี data-effect กำหนดแอนิเมชันตอนเลื่อนหน้าจอ: fade / zoom / parallax / slide-left / slide-right -->
-      <figure class="gallery-item" data-effect="fade">
-        <img src="1.jpeg" alt="ความทรงจำ 1" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
-      <figure class="gallery-item" data-effect="slide-left">
-        <img src="2.jpeg" alt="ความทรงจำ 2" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
-      <figure class="gallery-item" data-effect="zoom">
-        <img src="3.png" alt="ความทรงจำ 3" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
-      <figure class="gallery-item" data-effect="slide-right">
-        <img src="4.jpg" alt="ความทรงจำ 4" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
-      <figure class="gallery-item" data-effect="parallax">
-        <img src="5.jpeg" alt="ความทรงจำ 5" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
-      <figure class="gallery-item" data-effect="fade">
-        <img src="6.jpeg" alt="ความทรงจำ 6" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
-      <figure class="gallery-item" data-effect="slide-left">
-        <img src="7.jpeg" alt="ความทรงจำ 7" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
-      <figure class="gallery-item" data-effect="zoom">
-        <img src="8.jpeg" alt="ความทรงจำ 8" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
-      <figure class="gallery-item" data-effect="slide-right">
-        <img src="9.jpeg" alt="ความทรงจำ 9" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
-      <figure class="gallery-item" data-effect="parallax">
-        <img src="10.jpeg" alt="ความทรงจำ 10" loading="lazy" onerror="this.parentElement.classList.add('img-fallback')">
-        <figcaption>💗</figcaption>
-      </figure>
+    <div class="counter-box">
+      <span class="counter-num" id="count-minutes">0</span>
+      <span class="counter-label">นาที</span>
     </div>
-  </section>
-
-  <!-- ================= ฉากที่ 4: ตอนจบ ================= -->
-  <section id="ending-scene">
-    <div id="petals-fall" aria-hidden="true"></div>
-    <div id="confetti-layer" aria-hidden="true"></div>
-
-    <div class="ending-content">
-      <div class="big-heart">❤</div>
-      <h1 class="ending-text">รักอ้วนมากที่สุด ❤️</h1>
-      <p class="ending-sub">จากคนที่รักอ้วนที่สุด</p>
+    <div class="counter-box">
+      <span class="counter-num" id="count-seconds">0</span>
+      <span class="counter-label">วิฯ</span>
     </div>
-  </section>
+  </div>
 
-  <script src="script.js"></script>
+  <p class="counter-caption">ทุกวินาทีที่มีเธอ มีความหมายสำหรับเค้า ❤️</p>
+  <button class="next-btn" id="counter-next-btn">ดูต่อ →</button>
+</section>
+
+<!-- ============================================================
+     PAGE 7 — VOICE MESSAGE
+============================================================ -->
+<section id="page-voice" class="page">
+  <div class="soft-hearts-bg" id="dust-voice"></div>
+  <div class="voice-card">
+    <div class="voice-mic">🎙️</div>
+    <p class="voice-title">ข้อความเสียงจากเค้า ❤️</p>
+    <button class="voice-play-btn" id="voice-play-btn">▶ เล่น</button>
+    <div class="voice-wave" id="voice-wave">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+  <button class="next-btn" id="voice-next-btn">ดูต่อ →</button>
+</section>
+
+<!-- ============================================================
+     PAGE 8 — ENDING
+============================================================ -->
+<section id="page-ending" class="page">
+  <div class="ending-stars" id="ending-stars"></div>
+  <div class="soft-hearts-bg" id="dust-ending"></div>
+
+  <div class="ending-content">
+    <p id="ending-text" class="ending-text"></p>
+    <span class="typewriter-cursor" id="ending-cursor">|</span>
+    <button class="hug-btn" id="hug-btn" style="display:none;">❤️ กอดหน่อย ❤️</button>
+  </div>
+
+  <div class="hug-burst" id="hug-burst"></div>
+</section>
+
+<!-- audio elements -->
+<audio id="audio-song" src="assets/song.mp3" loop></audio>
+<audio id="audio-voice" src="assets/voice.mp3"></audio>
+<audio id="audio-unlock" src="assets/unlock.mp3"></audio>
+<audio id="audio-click" src="assets/click.mp3"></audio>
+<audio id="audio-whoosh" src="assets/whoosh.mp3"></audio>
+<audio id="audio-paper" src="assets/paper.mp3"></audio>
+
+<script src="script.js"></script>
 </body>
 </html>

@@ -1,276 +1,530 @@
-/* =====================================================================
-   สคริปต์หลักของเว็บไซต์บอกรัก
-   แบ่งเป็นฟังก์ชันย่อยตามฉาก เพื่อให้อ่านง่ายและดูแลง่าย
-   ===================================================================== */
-document.addEventListener('DOMContentLoaded', () => {
+/* =========================================================
+   ANNIVERSARY WEBSITE — SCRIPT
+   Vanilla JS only. Controls: PIN unlock, heart curtain,
+   envelope, typewriter letter, gallery, live counter,
+   voice message ducking, and the ending hug burst.
+========================================================= */
 
-  /* ---------------------------------------------------------------
-     1) สร้างดาวระยิบระยับพื้นหลัง
-  --------------------------------------------------------------- */
-  function createStars(){
-    const container = document.getElementById('bg-stars');
-    const count = window.innerWidth < 600 ? 45 : 80;
-    const frag = document.createDocumentFragment();
-    for(let i = 0; i < count; i++){
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = Math.random() * 100 + 'vw';
-      star.style.top = Math.random() * 100 + 'vh';
-      star.style.animationDelay = (Math.random() * 2.6) + 's';
-      star.style.animationDuration = (2 + Math.random() * 2) + 's';
-      frag.appendChild(star);
+(() => {
+  "use strict";
+
+  /* ---------- CONFIG — edit these two lines for your story ---------- */
+  const CORRECT_PIN = "011025";
+  const RELATIONSHIP_START = new Date("2025-01-01T00:00:00"); // วันเริ่มคบ (ปรับได้ตรงนี้)
+
+  const LETTER_TEXT =
+    "ถึงคนที่เค้ารักที่สุด,\n\n" +
+    "ขอบคุณนะที่เดินเข้ามาในชีวิตเค้า และอยู่ตรงนี้เสมอมา\n" +
+    "ทุกวันที่ผ่านไปกับเธอ มันเต็มไปด้วยรอยยิ้มและความอบอุ่น\n\n" +
+    "วันนี้เป็นอีกหนึ่งวันพิเศษของเรา เค้าอยากให้เธอรู้ว่า\n" +
+    "เค้ารักเธอมากแค่ไหน และจะรักแบบนี้ต่อไปเรื่อย ๆ ❤️";
+
+  const ENDING_TEXT =
+    "สุขสันต์วันครบรอบนะ ❤️\n" +
+    "ขอบคุณที่อยู่ข้างกันมาตลอด\n" +
+    "เค้ารักเธอมากนะ";
+
+  const HEART_EMOJIS = ["❤️", "💖", "💗", "💕", "💞", "💘", "🩷", "🤍"];
+
+  /* ---------- helpers ---------- */
+  const $ = (id) => document.getElementById(id);
+  const rand = (min, max) => Math.random() * (max - min) + min;
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+  function playSound(audioEl) {
+    if (!audioEl) return;
+    try {
+      audioEl.currentTime = 0;
+      audioEl.play().catch(() => {});
+    } catch (e) {
+      /* asset missing — fail silently so the experience keeps going */
     }
-    container.appendChild(frag);
   }
 
-  /* ---------------------------------------------------------------
-     2) หัวใจลอยขึ้นเรื่อย ๆ ตลอดทั้งเว็บ
-  --------------------------------------------------------------- */
-  function spawnFloatingHeart(){
-    const container = document.getElementById('bg-hearts');
-    const heart = document.createElement('div');
-    heart.className = 'floating-heart';
-    const emojis = ['❤️','💕','💖','💗','🌸'];
-    heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    heart.style.left = Math.random() * 100 + 'vw';
-    heart.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
-    const duration = 7 + Math.random() * 6;
-    heart.style.animationDuration = duration + 's';
-    heart.style.fontSize = (14 + Math.random() * 14) + 'px';
-    container.appendChild(heart);
-    setTimeout(() => heart.remove(), duration * 1000 + 200);
-  }
-  setInterval(spawnFloatingHeart, 650);
-
-  /* ---------------------------------------------------------------
-     3) หัวใจฟองสบู่เมื่อแตะ/คลิกหน้าจอ
-  --------------------------------------------------------------- */
-  function spawnTapBubble(x, y){
-    const bubble = document.createElement('div');
-    bubble.className = 'tap-bubble';
-    const emojis = ['💖','💕','❤️','💗'];
-    bubble.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    bubble.style.left = (x - 10) + 'px';
-    bubble.style.top = (y - 10) + 'px';
-    document.body.appendChild(bubble);
-    setTimeout(() => bubble.remove(), 1150);
-  }
-  document.addEventListener('pointerdown', (e) => {
-    spawnTapBubble(e.clientX, e.clientY);
-  });
-
-  /* ---------------------------------------------------------------
-     4) เพลงพื้นหลัง
-  --------------------------------------------------------------- */
-  const music = document.getElementById('bg-music');
-  const musicPlayer = document.getElementById('music-player');
-  const musicToggle = document.getElementById('music-toggle');
-  const musicIcon = document.getElementById('music-icon');
-  const volumeSlider = document.getElementById('volume-slider');
-  let musicStarted = false;
-
-  music.volume = parseFloat(volumeSlider.value);
-
-  function playMusic(){
-    if(musicStarted) return;
-    musicStarted = true;
-    music.play().catch(() => { /* บางเบราว์เซอร์อาจบล็อกจนกว่าจะมีการโต้ตอบเพิ่ม */ });
-    musicIcon.textContent = '🎵';
-    musicPlayer.classList.remove('hidden');
+  function goToPage(fromId, toId) {
+    const from = $(fromId);
+    const to = $(toId);
+    if (from) from.classList.remove("page-active");
+    if (to) to.classList.add("page-active");
   }
 
-  musicToggle.addEventListener('click', () => {
-    if(music.paused){
-      music.play().catch(() => {});
-      musicIcon.textContent = '🎵';
-    } else {
-      music.pause();
-      musicIcon.textContent = '🔇';
+  /* =========================================================
+     AMBIENT DUST / FLOATING HEARTS (shared background effect)
+  ========================================================= */
+  function spawnDust(containerId, count) {
+    const el = $(containerId);
+    if (!el) return;
+    for (let i = 0; i < count; i++) {
+      const mote = document.createElement("div");
+      mote.className = "dust-mote";
+      mote.style.left = rand(0, 100) + "%";
+      mote.style.bottom = rand(-10, 0) + "%";
+      mote.style.animationDuration = rand(6, 12) + "s";
+      mote.style.animationDelay = rand(0, 8) + "s";
+      el.appendChild(mote);
     }
-  });
+  }
 
-  volumeSlider.addEventListener('input', () => {
-    music.volume = parseFloat(volumeSlider.value);
-  });
+  function spawnSoftHearts(containerId, count) {
+    const el = $(containerId);
+    if (!el) return;
+    for (let i = 0; i < count; i++) {
+      const h = document.createElement("span");
+      h.className = "soft-heart";
+      h.textContent = pick(HEART_EMOJIS);
+      h.style.left = rand(0, 100) + "%";
+      h.style.fontSize = rand(14, 26) + "px";
+      h.style.setProperty("--drift", rand(-30, 30) + "px");
+      h.style.animationDuration = rand(9, 18) + "s";
+      h.style.animationDelay = rand(0, 10) + "s";
+      el.appendChild(h);
+    }
+  }
 
-  /* ---------------------------------------------------------------
-     5) เปิดซองจดหมาย 3 มิติ -> เข้าสู่ฉากจดหมาย
-  --------------------------------------------------------------- */
-  const envelope = document.getElementById('envelope');
-  const introScene = document.getElementById('intro-scene');
-  const letterScene = document.getElementById('letter-scene');
-  const tapHint = document.getElementById('tap-hint');
-  let opened = false;
+  spawnDust("dust-lock", 22);
+  ["dust-envelope", "dust-letter", "dust-counter", "dust-voice", "dust-ending"].forEach(
+    (id) => spawnSoftHearts(id, 10)
+  );
 
-  function openEnvelope(){
-    if(opened) return;
-    opened = true;
+  /* =========================================================
+     PAGE 1 — LOCK SCREEN / CUSTOM KEYPAD
+  ========================================================= */
+  let enteredPin = "";
+  const pinDotsWrap = $("pin-dots");
+  const pinDots = pinDotsWrap.querySelectorAll(".pin-dot");
+  const lockScreen = $("page-lock");
+  const audioClick = $("audio-click");
+  const audioUnlock = $("audio-unlock");
 
-    envelope.classList.add('is-open');
-    tapHint.style.opacity = '0';
-    playMusic();
-    burstPetals(26); // กลีบกุหลาบโปรยหลังเปิดจดหมาย
+  function refreshDots() {
+    pinDots.forEach((dot, i) => {
+      dot.classList.toggle("filled", i < enteredPin.length);
+    });
+  }
 
-    // รอให้แอนิเมชันซองเปิดและซูมเข้าเสร็จก่อนค่อยเลื่อนไปฉากจดหมาย
+  function wrongPin() {
+    pinDotsWrap.classList.add("shake");
+    lockScreen.classList.add("shake-screen");
+    if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
     setTimeout(() => {
-      introScene.classList.add('scene-exit');
-      setTimeout(() => {
-        introScene.style.display = 'none';
-        letterScene.classList.add('scene-enter');
-        letterScene.scrollIntoView({ behavior: 'instant', block: 'start' });
-        startTypewriter();
-      }, 900);
-    }, 1000);
+      pinDotsWrap.classList.remove("shake");
+      lockScreen.classList.remove("shake-screen");
+      enteredPin = "";
+      refreshDots();
+    }, 420);
   }
 
-  envelope.addEventListener('click', openEnvelope);
-  envelope.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openEnvelope(); }
+  function correctPin() {
+    playSound(audioUnlock);
+    const mask = $("lock-mask");
+    mask.classList.add("active");
+    setTimeout(() => {
+      goToPage("page-lock", "page-curtain");
+      startHeartCurtain();
+      mask.classList.remove("active");
+    }, 650);
+  }
+
+  function ripple(button, evt) {
+    const r = document.createElement("span");
+    r.className = "ripple";
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.width = r.style.height = size + "px";
+    const x = (evt.touches ? evt.touches[0].clientX : evt.clientX) - rect.left - size / 2;
+    const y = (evt.touches ? evt.touches[0].clientY : evt.clientY) - rect.top - size / 2;
+    r.style.left = x + "px";
+    r.style.top = y + "px";
+    button.appendChild(r);
+    setTimeout(() => r.remove(), 500);
+  }
+
+  $("keypad").querySelectorAll(".key").forEach((btn) => {
+    const handler = (evt) => {
+      evt.preventDefault();
+      ripple(btn, evt);
+      playSound(audioClick);
+
+      const key = btn.dataset.key;
+      if (key === "back") {
+        enteredPin = enteredPin.slice(0, -1);
+        refreshDots();
+        return;
+      }
+      if (key === "heart") {
+        // heart key submits early / acts as decorative confirm
+        if (enteredPin.length === 6) {
+          enteredPin === CORRECT_PIN ? correctPin() : wrongPin();
+        }
+        return;
+      }
+      if (enteredPin.length >= 6) return;
+      enteredPin += key;
+      refreshDots();
+
+      if (enteredPin.length === 6) {
+        setTimeout(() => {
+          enteredPin === CORRECT_PIN ? correctPin() : wrongPin();
+        }, 150);
+      }
+    };
+    btn.addEventListener("touchstart", handler, { passive: false });
+    btn.addEventListener("click", handler);
   });
 
-  /* ---------------------------------------------------------------
-     6) เอฟเฟกต์พิมพ์ดีดสำหรับข้อความจดหมาย
-  --------------------------------------------------------------- */
-  const letterMessage =
-`ถึงอ้วน 💌
+  /* =========================================================
+     PAGE 2 — HEART CURTAIN TRANSITION
+  ========================================================= */
+  const audioWhoosh = $("audio-whoosh");
 
-เค้ารักอ้วนน้ารักมากๆ
+  function buildCurtainSide(sideEl) {
+    sideEl.innerHTML = "";
+    const cols = 4;
+    const rows = 10; // ~40 hearts per side x2 sides ≈ 80–100+ visible, tiled to feel dense
+    const total = cols * rows;
+    for (let i = 0; i < total; i++) {
+      const tile = document.createElement("div");
+      tile.className = "heart-tile";
+      const size = pick([70, 90, 110, 130]) * 0.55; // scaled down to fit tile grid on mobile
+      tile.style.fontSize = size + "px";
+      tile.textContent = pick(HEART_EMOJIS);
+      sideEl.appendChild(tile);
+    }
+  }
 
-เค้าจะไม่ทิ้งอ้วนเค้าสัญญา
+  function startHeartCurtain() {
+    const left = $("curtain-left");
+    const right = $("curtain-right");
+    buildCurtainSide(left);
+    buildCurtainSide(right);
+    left.classList.remove("sweep-in", "sweep-out", "bloom");
+    right.classList.remove("sweep-in", "sweep-out", "bloom");
+    // force reflow so animation restarts cleanly
+    void left.offsetWidth;
 
-กอดๆน้า
+    left.classList.add("sweep-in");
+    right.classList.add("sweep-in");
+    playSound(audioWhoosh);
 
-จากคนที่รักอ้วนที่สุด`;
+    setTimeout(() => {
+      left.classList.add("bloom");
+      right.classList.add("bloom");
+      flashPink();
+    }, 700);
 
-  const typewriterEl = document.getElementById('typewriter-text');
-  let typewriterDone = false;
+    setTimeout(() => {
+      left.classList.remove("sweep-in");
+      right.classList.remove("sweep-in");
+      left.classList.add("sweep-out");
+      right.classList.add("sweep-out");
+      playSound(audioWhoosh);
+    }, 1700);
 
-  function startTypewriter(){
-    if(typewriterDone) return;
-    typewriterDone = true;
+    setTimeout(() => {
+      goToPage("page-curtain", "page-envelope");
+    }, 2500);
+  }
+
+  function flashPink() {
+    const flash = document.createElement("div");
+    flash.className = "curtain-flash flash-active";
+    document.body.appendChild(flash);
+    setTimeout(() => flash.remove(), 1050);
+  }
+
+  /* =========================================================
+     PAGE 3 — ENVELOPE + MUSIC START
+  ========================================================= */
+  const audioPaper = $("audio-paper");
+  const audioSong = $("audio-song");
+  const musicToggle = $("music-toggle");
+  let songStarted = false;
+  let musicOn = true;
+
+  function fadeInSong() {
+    if (songStarted) return;
+    songStarted = true;
+    audioSong.volume = 0;
+    audioSong.play().catch(() => {});
+    let vol = 0;
+    const step = setInterval(() => {
+      vol += 0.05;
+      audioSong.volume = Math.min(vol, 1);
+      if (vol >= 1) clearInterval(step);
+    }, 120); // ~2.4s fade-in
+  }
+
+  $("envelope").addEventListener("click", () => {
+    const flap = $("envelope-flap");
+    const paper = $("envelope-paper");
+    const seal = $("envelope-seal");
+    if (flap.classList.contains("open")) return;
+
+    seal.classList.add("hide");
+    flap.classList.add("open");
+    playSound(audioPaper);
+
+    setTimeout(() => {
+      paper.classList.add("rise");
+      fadeInSong();
+    }, 350);
+
+    setTimeout(() => {
+      goToPage("page-envelope", "page-letter");
+      startLetterTypewriter();
+    }, 1900);
+  });
+
+  musicToggle.addEventListener("click", () => {
+    musicOn = !musicOn;
+    musicToggle.textContent = musicOn ? "🎵" : "🔇";
+    if (musicOn) {
+      audioSong.play().catch(() => {});
+    } else {
+      audioSong.pause();
+    }
+  });
+
+  /* =========================================================
+     PAGE 4 — LOVE LETTER (typewriter)
+  ========================================================= */
+  function startLetterTypewriter() {
+    const el = $("letter-text");
+    const nextBtn = $("letter-next-btn");
+    el.textContent = "";
+    nextBtn.style.display = "none";
     let i = 0;
-    const speed = 32; // ms ต่ออักษร ให้ความรู้สึกลื่นไหลไม่ช้าเกินไป
+    const speed = 38;
 
-    function typeNext(){
-      if(i < letterMessage.length){
-        typewriterEl.textContent += letterMessage[i];
+    function typeChar() {
+      if (i < LETTER_TEXT.length) {
+        el.textContent += LETTER_TEXT.charAt(i);
         i++;
-        // พิมพ์เร็วขึ้นเล็กน้อยสำหรับช่องว่าง เพื่อจังหวะที่เป็นธรรมชาติ
-        const delay = letterMessage[i - 1] === '\n' ? speed * 4 : speed;
-        setTimeout(typeNext, delay);
+        setTimeout(typeChar, speed);
+      } else {
+        nextBtn.style.display = "inline-block";
       }
     }
-    typeNext();
+    typeChar();
   }
 
-  /* ---------------------------------------------------------------
-     7) ตัวนับเวลาที่คบกันแบบ Real-time
-  --------------------------------------------------------------- */
-  const startDate = new Date(2025, 9, 1, 0, 0, 0); // 01/10/2025 (เดือน index เริ่มที่ 0)
-  const elDays = document.getElementById('count-days');
-  const elHours = document.getElementById('count-hours');
-  const elMinutes = document.getElementById('count-minutes');
-  const elSeconds = document.getElementById('count-seconds');
+  $("letter-next-btn").addEventListener("click", () => {
+    goToPage("page-letter", "page-gallery");
+    if (!galleryBuilt) buildGallery();
+  });
 
-  function updateCounter(){
+  /* =========================================================
+     PAGE 5 — GALLERY
+  ========================================================= */
+  let galleryBuilt = false;
+  const MAX_IMAGE_PROBE = 20; // tries assets/images/1.jpg ... 20.jpg, skips missing ones
+
+  function buildGallery() {
+    galleryBuilt = true;
+    const track = $("gallery-track");
+    const dotsWrap = $("gallery-dots");
+    let loaded = 0;
+
+    for (let i = 1; i <= MAX_IMAGE_PROBE; i++) {
+      const img = new Image();
+      img.src = `assets/images/${i}.jpg`;
+      img.onload = () => {
+        const slide = document.createElement("div");
+        slide.className = "gallery-slide";
+        const imgEl = document.createElement("img");
+        imgEl.src = img.src;
+        imgEl.alt = "ความทรงจำ " + i;
+        imgEl.addEventListener("click", () => openFullscreen(img.src));
+        slide.appendChild(imgEl);
+        track.appendChild(slide);
+
+        const dot = document.createElement("span");
+        dot.className = "gallery-dot";
+        dotsWrap.appendChild(dot);
+        if (loaded === 0) dot.classList.add("active");
+        loaded++;
+      };
+      img.onerror = () => {
+        /* image N doesn't exist — just skip it */
+      };
+    }
+
+    track.addEventListener("scroll", () => {
+      const idx = Math.round(track.scrollLeft / track.clientWidth);
+      dotsWrap.querySelectorAll(".gallery-dot").forEach((d, i) => {
+        d.classList.toggle("active", i === idx);
+      });
+    });
+  }
+
+  function openFullscreen(src) {
+    $("fullscreen-img").src = src;
+    $("fullscreen-viewer").classList.add("open");
+  }
+  $("fullscreen-viewer").addEventListener("click", () => {
+    $("fullscreen-viewer").classList.remove("open");
+  });
+
+  $("gallery-next-btn").addEventListener("click", () => {
+    goToPage("page-gallery", "page-counter");
+    startCounter();
+  });
+
+  /* =========================================================
+     PAGE 6 — ANNIVERSARY COUNTER
+  ========================================================= */
+  let counterInterval = null;
+  let counterStarted = false;
+
+  function computeElapsed() {
     const now = new Date();
-    let diff = Math.max(0, now - startDate);
-
+    let diff = Math.max(0, now - RELATIONSHIP_START);
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    diff -= days * (1000 * 60 * 60 * 24);
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    diff -= hours * (1000 * 60 * 60);
-    const minutes = Math.floor(diff / (1000 * 60));
-    diff -= minutes * (1000 * 60);
-    const seconds = Math.floor(diff / 1000);
-
-    elDays.textContent = days;
-    elHours.textContent = String(hours).padStart(2, '0');
-    elMinutes.textContent = String(minutes).padStart(2, '0');
-    elSeconds.textContent = String(seconds).padStart(2, '0');
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    return { days, hours, minutes, seconds };
   }
-  updateCounter();
-  setInterval(updateCounter, 1000);
 
-  /* ---------------------------------------------------------------
-     8) แกลเลอรี: เล่นแอนิเมชันตามเอฟเฟกต์ที่กำหนดเมื่อเลื่อนเข้ามาในจอ
-  --------------------------------------------------------------- */
-  const galleryItems = document.querySelectorAll('.gallery-item');
-  const galleryObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        entry.target.classList.add('in-view');
-        galleryObserver.unobserve(entry.target);
+  function animateNumberTo(el, target, duration) {
+    const start = performance.now();
+    function frame(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const value = Math.floor(progress * target);
+      el.textContent = value;
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        el.textContent = target;
       }
-    });
-  }, { threshold: 0.25, rootMargin: '0px 0px -8% 0px' });
-
-  galleryItems.forEach(item => galleryObserver.observe(item));
-
-  // เอฟเฟกต์ parallax เบา ๆ ตอนเลื่อนหน้าจอ สำหรับรูปที่กำหนด data-effect="parallax"
-  const parallaxItems = document.querySelectorAll('.gallery-item[data-effect="parallax"]');
-  function updateParallax(){
-    parallaxItems.forEach(item => {
-      if(!item.classList.contains('in-view')) return;
-      const rect = item.getBoundingClientRect();
-      const offset = (rect.top - window.innerHeight / 2) * 0.06;
-      item.style.transform = `translateY(${offset}px)`;
-    });
+    }
+    requestAnimationFrame(frame);
   }
-  window.addEventListener('scroll', () => requestAnimationFrame(updateParallax), { passive: true });
 
-  /* ---------------------------------------------------------------
-     9) ตอนจบ: กลีบกุหลาบเต็มจอ + Confetti + ข้อความใหญ่ (เล่นครั้งเดียว)
-  --------------------------------------------------------------- */
-  function burstPetals(amount){
-    const layer = document.getElementById('petals-fall');
-    const petalEmojis = ['🌸','🌹','💮'];
-    for(let i = 0; i < amount; i++){
-      const petal = document.createElement('div');
-      petal.className = 'petal';
-      petal.textContent = petalEmojis[Math.floor(Math.random() * petalEmojis.length)];
-      petal.style.left = Math.random() * 100 + '%';
-      petal.style.setProperty('--drift', (Math.random() * 120 - 60) + 'px');
-      const duration = 3 + Math.random() * 2.5;
-      petal.style.animationDuration = duration + 's';
-      petal.style.animationDelay = (Math.random() * 1.2) + 's';
-      petal.style.fontSize = (14 + Math.random() * 12) + 'px';
-      layer.appendChild(petal);
-      setTimeout(() => petal.remove(), (duration + 1.5) * 1000);
+  function pulse(el) {
+    el.classList.remove("pulse");
+    void el.offsetWidth;
+    el.classList.add("pulse");
+  }
+
+  function startCounter() {
+    if (counterStarted) return;
+    counterStarted = true;
+    const { days, hours, minutes, seconds } = computeElapsed();
+    const dEl = $("count-days"), hEl = $("count-hours"), mEl = $("count-minutes"), sEl = $("count-seconds");
+
+    animateNumberTo(dEl, days, 800);
+    animateNumberTo(hEl, hours, 800);
+    animateNumberTo(mEl, minutes, 800);
+    animateNumberTo(sEl, seconds, 800);
+
+    let last = { days, hours, minutes, seconds };
+
+    setTimeout(() => {
+      counterInterval = setInterval(() => {
+        const now = computeElapsed();
+        if (now.seconds !== last.seconds) { sEl.textContent = now.seconds; pulse(sEl); }
+        if (now.minutes !== last.minutes) { mEl.textContent = now.minutes; pulse(mEl); }
+        if (now.hours !== last.hours) { hEl.textContent = now.hours; pulse(hEl); }
+        if (now.days !== last.days) { dEl.textContent = now.days; pulse(dEl); }
+        last = now;
+      }, 1000);
+    }, 850);
+  }
+
+  $("counter-next-btn").addEventListener("click", () => {
+    goToPage("page-counter", "page-voice");
+  });
+
+  /* =========================================================
+     PAGE 7 — VOICE MESSAGE (ducks background song)
+  ========================================================= */
+  const audioVoice = $("audio-voice");
+  const voiceWave = $("voice-wave");
+  const voicePlayBtn = $("voice-play-btn");
+
+  function fadeSongTo(target, duration) {
+    const startVol = audioSong.volume;
+    const startTime = performance.now();
+    function step(now) {
+      const p = Math.min((now - startTime) / duration, 1);
+      audioSong.volume = startVol + (target - startVol) * p;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  voicePlayBtn.addEventListener("click", () => {
+    if (!audioVoice.paused) return;
+    fadeSongTo(0.2, 400);
+    audioVoice.currentTime = 0;
+    audioVoice.play().catch(() => {});
+    voiceWave.classList.add("playing");
+    voicePlayBtn.textContent = "🔊 กำลังเล่น...";
+  });
+
+  audioVoice.addEventListener("ended", () => {
+    voiceWave.classList.remove("playing");
+    voicePlayBtn.textContent = "▶ เล่นอีกครั้ง";
+    fadeSongTo(1, 800);
+  });
+
+  $("voice-next-btn").addEventListener("click", () => {
+    goToPage("page-voice", "page-ending");
+    startEnding();
+  });
+
+  /* =========================================================
+     PAGE 8 — ENDING
+  ========================================================= */
+  let endingStarted = false;
+
+  function spawnStars() {
+    const wrap = $("ending-stars");
+    for (let i = 0; i < 40; i++) {
+      const s = document.createElement("div");
+      s.className = "star";
+      s.style.left = rand(0, 100) + "%";
+      s.style.top = rand(0, 100) + "%";
+      s.style.animationDelay = rand(0, 3) + "s";
+      wrap.appendChild(s);
     }
   }
+  spawnStars();
 
-  function burstConfetti(amount){
-    const layer = document.getElementById('confetti-layer');
-    const colors = ['#F0A9BC', '#D4AF7A', '#F8D2DC', '#EAD3A3', '#E27E97'];
-    for(let i = 0; i < amount; i++){
-      const piece = document.createElement('div');
-      piece.className = 'confetti-piece';
-      piece.style.left = Math.random() * 100 + '%';
-      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-      const duration = 3 + Math.random() * 2;
-      piece.style.animationDuration = duration + 's';
-      piece.style.animationDelay = (Math.random() * 0.8) + 's';
-      layer.appendChild(piece);
-      setTimeout(() => piece.remove(), (duration + 1.2) * 1000);
+  function startEnding() {
+    if (endingStarted) return;
+    endingStarted = true;
+    const el = $("ending-text");
+    const hugBtn = $("hug-btn");
+    let i = 0;
+    function typeChar() {
+      if (i < ENDING_TEXT.length) {
+        el.textContent += ENDING_TEXT.charAt(i);
+        i++;
+        setTimeout(typeChar, 40);
+      } else {
+        hugBtn.style.display = "inline-block";
+      }
     }
+    typeChar();
   }
 
-  const endingScene = document.getElementById('ending-scene');
-  let endingPlayed = false;
-  const endingObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting && !endingPlayed){
-        endingPlayed = true;
-        burstPetals(40);
-        burstConfetti(60);
-        // โปรยกลีบกุหลาบซ้ำเป็นระลอกให้ตอนจบดูอบอุ่นและมีชีวิตชีวา
-        setTimeout(() => burstPetals(30), 1400);
-        setTimeout(() => burstConfetti(40), 1600);
-      }
-    });
-  }, { threshold: 0.4 });
-
-  endingObserver.observe(endingScene);
-
-});
+  $("hug-btn").addEventListener("click", () => {
+    const burst = $("hug-burst");
+    burst.innerHTML = "";
+    for (let i = 0; i < 240; i++) {
+      const h = document.createElement("span");
+      h.className = "hug-burst-heart";
+      h.textContent = pick(HEART_EMOJIS);
+      h.style.left = rand(0, 100) + "%";
+      h.style.fontSize = rand(18, 42) + "px";
+      h.style.animationDuration = rand(1.8, 2.8) + "s";
+      h.style.animationDelay = rand(0, 0.6) + "s";
+      burst.appendChild(h);
+    }
+    setTimeout(() => {
+      burst.classList.add("fade-out");
+    }, 2600);
+  });
+})();
