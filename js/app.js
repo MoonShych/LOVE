@@ -24,10 +24,7 @@ const CONFIG = {
     imagePath: "assets/images/",
 
     imageExt: [
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp"
+        ".jpeg"
     ]
 };
 
@@ -403,60 +400,31 @@ Happy Anniversary นะ
   /* ============================================================
      PAGE 4 — MEMORY GALLERY
      ============================================================ */
-function buildGallery(){
+  function buildGallery(){
     const grid = $('#galleryGrid');
     grid.innerHTML = '';
     galleryImages = [];
-
     for (let i = 1; i <= CONFIG.imageCount; i++){
+      const src = `${CONFIG.imagePath}${i}${CONFIG.imageExt}`;
+      galleryImages.push(src);
 
-        const cell = document.createElement('div');
-        cell.className = 'gallery-item';
-        cell.dataset.index = i - 1;
+      const cell = document.createElement('div');
+      cell.className = 'gallery-item';
+      cell.dataset.index = i - 1;
 
-        const img = document.createElement('img');
-        img.alt = 'memory ' + i;
-        img.loading = 'lazy';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = 'memory ' + i;
+      img.loading = 'lazy';
+      img.onerror = () => {
+        cell.innerHTML = `<div class="ph">📷<br>เพิ่มรูปที่<br>${CONFIG.imagePath}${i}${CONFIG.imageExt}</div>`;
+      };
+      cell.appendChild(img);
 
-        let found = false;
-
-        // ลองหาทุกนามสกุล
-        for (const ext of CONFIG.imageExt){
-
-            const src = `${CONFIG.imagePath}${i}${ext}`;
-
-            const testImg = new Image();
-
-            testImg.onload = () => {
-                if (!found){
-                    found = true;
-                    img.src = src;
-                    galleryImages[i - 1] = src;
-                }
-            };
-
-            testImg.src = src;
-        }
-
-        img.onerror = () => {
-            cell.innerHTML = `
-            <div class="ph">
-                📷<br>
-                เพิ่มรูปที่<br>
-                ${CONFIG.imagePath}${i}
-            </div>`;
-        };
-
-
-        cell.appendChild(img);
-
-        cell.addEventListener('click', () => {
-            openLightbox(i - 1);
-        });
-
-        grid.appendChild(cell);
+      cell.addEventListener('click', () => openLightbox(i - 1));
+      grid.appendChild(cell);
     }
-}
+  }
 
   function openLightbox(index){
     const cell = $('#galleryGrid').children[index];
