@@ -24,7 +24,8 @@ const CONFIG = {
     imagePath: "assets/images/",
 
     imageExt: [
-        ".jpeg"
+        ".jpeg",
+        ".png"
     ]
 };
 
