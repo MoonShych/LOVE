@@ -14,18 +14,19 @@ const CONFIG = {
 
     startDate: "2025-10-01T00:00:00",
 
-    hint: "💭 Hint : วันที่ที่ทุกอย่างเริ่มต้น",
-
-    music: "assets/music/song.mp3",
-    voice: "assets/voice/voice1.mp3",
-    letter: "assets/letter/letter.txt",
-
-    imageCount: 10,
     imagePath: "assets/images/",
 
-    imageExt: [
-        ".jpeg",
-        ".png"
+    images: [
+        "1.jpeg",
+        "2.jpeg",
+        "3.png",
+        "4.jpeg",
+        "5.jpeg",
+        "6.jpeg",
+        "7.jpeg",
+        "8.jpeg",
+        "9.jpeg",
+        "10.jpeg"
     ]
 };
 
