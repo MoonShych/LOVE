@@ -20,12 +20,11 @@ const CONFIG = {
     voice: "assets/voice/voice1.mp3",
     letter: "assets/letter/letter.txt",
 
-    imageCount: 10,
+    imageCount: 9,
     imagePath: "assets/images/",
 
     imageExt: [
-        ".jpeg",
-        ".png"
+        ".jpeg"
     ]
 };
 
